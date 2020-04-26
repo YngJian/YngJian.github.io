@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Vayne的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Vayne的博客">
+<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:site_name" content="Vayne的博客">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="Yang Jian">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Vayne的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Vayne的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-gateway的配置说明" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/04/26/gateway%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E/" class="article-date">
+  <time datetime="2020-04-26T02:34:05.989Z" itemprop="datePublished">2020-04-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/04/26/gateway%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E/">gateway的配置说明</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>1.下载网关jar包。</p>
+<p>2.服务器创建目录，结构为：tiny_gateway/conf（放置配置文件bootstrap.yml）    tiny_gateway/lib（放置jar 包）    tiny_gateway/logs（放置log文件）如果是Linux服务器，给tiny_gateway可读写权限:chmod 777 tiny_gateway</p>
+<p>3.bootstrap.yml内容配置：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">tiny-gateway</span></span><br><span class="line">    <span class="attr">profiles:</span></span><br><span class="line">    <span class="attr">active:</span> <span class="string">yang</span> <span class="string">(生效的配置文件)</span></span><br><span class="line">  <span class="comment">#看是否需要nacos，需要的话，加入下面配置。</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">config:</span></span><br><span class="line">        <span class="attr">prefix:</span> <span class="string">application</span> <span class="string">(文件前缀)</span></span><br><span class="line">        <span class="attr">group:</span> <span class="string">GATEWAY1</span> <span class="string">(用于nacos上的group)</span></span><br><span class="line">        <span class="attr">file-extension:</span> <span class="string">yml</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span> <span class="string">(nacos地址，注意：如果nacos和gateway都是docker启动的，留意容器与容器之间的IP关系)</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span> <span class="string">(nacos地址，注意：如果nacos和gateway都是docker启动的，留意容器与容器之间的IP关系)</span></span><br></pre></td></tr></table></figure>
+
+<p>4.配置生效的配置文件 application-yang.yml，如果没有用nacos，配置文件conf文件夹加入以下配置，如果是nacos，在nacos上配置以下文件。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">9400</span> <span class="string">（端口号）</span></span><br><span class="line"></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">tiny-gateway</span> <span class="string">（工程名）</span></span><br><span class="line">  <span class="attr">main:</span></span><br><span class="line">    <span class="attr">allow-bean-definition-overriding:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">key:</span></span><br><span class="line">  <span class="attr">redis:</span></span><br><span class="line">    <span class="attr">timeout:</span> <span class="number">30</span> <span class="string">（redis的默认过期时间）</span></span><br><span class="line"><span class="attr">rocketmq:</span></span><br><span class="line">  <span class="attr">producer:</span></span><br><span class="line">    <span class="attr">groupName:</span> <span class="string">app_gatway_group</span></span><br><span class="line">    <span class="attr">topic:</span> <span class="string">app_gateway_topic</span></span><br><span class="line">    <span class="attr">tag:</span> <span class="string">app_gateway_tag</span></span><br><span class="line"><span class="attr">logging:</span></span><br><span class="line">  <span class="attr">level:</span></span><br><span class="line">    <span class="attr">org.springframework.cloud.gateway:</span> <span class="string">TRACE</span></span><br><span class="line">    <span class="attr">org.springframework.http.server.reactive:</span> <span class="string">DEBUG</span></span><br><span class="line">    <span class="attr">org.springframework.web.reactive:</span> <span class="string">DEBUG</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">redis:</span></span><br><span class="line">    <span class="attr">host:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">6379</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">gateway:</span></span><br><span class="line">      <span class="attr">default-filters:</span></span><br><span class="line">      <span class="attr">routes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">demo_flow</span> <span class="string">(唯一id)</span></span><br><span class="line">          <span class="attr">uri:</span> <span class="string">http://127.0.0.1:9000</span> <span class="string">(跳转路径)</span></span><br><span class="line">          <span class="attr">predicates:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">Path=</span> <span class="string">/demo_flow/**</span> <span class="string">（匹配规则）</span></span><br><span class="line">          <span class="attr">filters:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">StripPrefix=1</span> <span class="string">（比如，请求/demo_flowe/login.tml，去除掉前面一个前缀之后，最后转发到目标服务的路径为/login.tml，不配就是不需要去掉前缀。）</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">Tiny</span> <span class="string">（自定义过滤父类工厂）</span></span><br><span class="line">       <span class="comment">#如果有多个项目，把id，uri,predicates,filters相关代码块向下复制，注意id唯一。</span></span><br><span class="line">      <span class="attr">plugin:</span> </span><br><span class="line">        <span class="attr">config:</span> </span><br><span class="line">          <span class="attr">log-request:</span> <span class="literal">true</span> <span class="string">（是否打印日志）</span></span><br><span class="line">          <span class="attr">read-request-data:</span> <span class="literal">true</span> <span class="string">（是否读取请求内容，必为true）</span></span><br><span class="line">          <span class="attr">read-response-data:</span> <span class="literal">true</span> <span class="string">（是否读取响应内容，必为true）</span></span><br><span class="line">          <span class="attr">read-request-data-path-list:</span> <span class="string">（需要读取的项目，以-换行隔开，填写上面唯一的id）</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">demo_flow</span> </span><br><span class="line">            <span class="bullet">-</span> <span class="string">digital_tbs</span></span><br><span class="line">    <span class="attr">stream:</span></span><br><span class="line">      <span class="attr">rocketmq:</span></span><br><span class="line">        <span class="attr">binder:</span></span><br><span class="line">          <span class="attr">enable-msg-trace:</span> <span class="literal">true</span> <span class="string">（是否开始mq的链路追踪）</span></span><br><span class="line">          <span class="attr">name-server:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:9876</span></span><br><span class="line">        <span class="attr">bindings:</span></span><br><span class="line">          <span class="attr">input:</span></span><br><span class="line">            <span class="attr">consumer:</span></span><br><span class="line">              <span class="attr">tags:</span> <span class="string">errorCode||tinySysApi</span> <span class="string">（需要监听的topic下的tags，以｜｜隔开，用于管理台配置的数据同步网关本地缓存）</span></span><br><span class="line">              <span class="attr">broadcasting:</span> <span class="literal">true</span> <span class="string">（是否开启广播模式）</span></span><br><span class="line">          <span class="comment"># producer</span></span><br><span class="line">          <span class="attr">output:</span></span><br><span class="line">            <span class="attr">producer:</span></span><br><span class="line">              <span class="attr">group:</span> <span class="string">point_yang</span> <span class="string">（mq发送组群名，建议一个项目一个名字）</span></span><br><span class="line">      <span class="attr">bindings:</span></span><br><span class="line">        <span class="attr">input:</span></span><br><span class="line">          <span class="attr">destination:</span> <span class="string">tiny_config</span> <span class="string">（消费者监听的topic）</span></span><br><span class="line">          <span class="attr">content-type:</span> <span class="string">application/json</span> <span class="string">（格式为json）</span></span><br><span class="line">          <span class="attr">group:</span> <span class="string">tinyGateway</span> <span class="string">（消费组群，建议一个项目一个名字）</span></span><br><span class="line">        <span class="comment"># producer</span></span><br><span class="line">        <span class="attr">output:</span></span><br><span class="line">          <span class="attr">destination:</span> <span class="string">market_mq_local</span> <span class="string">（需要发送的topic，用于日志发送mq给相关的服务）</span></span><br><span class="line">          <span class="attr">content-type:</span> <span class="string">text/plain</span></span><br><span class="line"></span><br><span class="line"><span class="attr">logging:</span></span><br><span class="line">  <span class="attr">config:</span> <span class="string">classpath:logback.xml</span> <span class="string">（logbook的配置文件路径）</span></span><br><span class="line"></span><br><span class="line"><span class="attr">tiny:</span></span><br><span class="line">  <span class="attr">encrypType:</span> <span class="string">rsa</span> <span class="string">（加密方式，默认rsa）</span></span><br><span class="line">  <span class="attr">filters:</span></span><br><span class="line">    <span class="attr">pre:</span> <span class="string">api,token（继承Tiny的过滤器，多个以，隔开。注意：不管有没有开启过token鉴权，只要请求头带有token，就需要请求头带有diviceID字段进行密钥的交换。）</span></span><br><span class="line">    <span class="attr">noconfig:</span></span><br><span class="line">      <span class="attr">pass:</span> <span class="literal">false</span> <span class="string">（是否开启管理台没有配置网关不进行校验放行转发）</span></span><br><span class="line">  <span class="attr">notoken:</span> <span class="string">index.tml,config.tml</span> <span class="string">（不需要token鉴权的接口）</span></span><br><span class="line">  <span class="attr">sys:</span></span><br><span class="line">    <span class="attr">rsa:</span></span><br><span class="line">      <span class="attr">publicKey:</span> <span class="string">MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCf/c5HudYApZKVMAyAthM5/eUQ9RGFdnelV6UTynkvqmSi+K6PUtrhyqVnny2Ywkc6ioWgCu953za5JN7NpK4dOmtR2lAtYceSUhNsFSpAit/I0v5Gsn6DG97uko0yzTz1MCViM4fqo+uKN/W9UwNzrsu2e66qA1Or0mNqa3Q8BwIDAQAB</span> <span class="string">（公钥）</span></span><br><span class="line">      <span class="attr">privateKey:</span> <span class="string">MRqP2S8oD3crgsTcSZcECLO6PDq7mbghACOMTWPz53xOk2oqmWLDmq9MEQJBANCef98TZB9F0okjg2MrIi92puSxvDaxU2Iy8RUfgE0IyjL4PRFLpM9+abMs7H/8BZ95pS1IsZzyw/LN5Bf2F78CQQDEVAB0i9uhq6PEx41GEr+OCSzgP/pVAksLo8kf5tCJXrNwxs6+bOroHL8nx585PAPJwBkcAhZpNA9qcZKvr625AkEAu9rd/nwxnk97Y+5Ms5H1uJO5eRnrB7zp/vUsTf8Nw1B08yzBoL9i601D1QpQ9HZ2gcJCUOKyvUeF1zA7grAhdQJAJtwpqufz9TAwHkcRY4laeRa/1zNSrXjiuc8VhEb/h/FCu1PeoDqW1JK8E3ejwIRsi4aGcdDH9tLjKkKIslWnoQJAR74M7QHUbyE08Wu5Rz0syMl4TipEQRrN4etK0jYBZlg357tt6DFQMYGh5HkKh8I9jioz6/LYkzxQJMqMIpp1QQ==（私钥）</span></span><br></pre></td></tr></table></figure>
+
+<p>5.如果某个项目需要降级熔断和超时控制，在项目的filters配置下添加如下配置</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">gateway:</span></span><br><span class="line">      <span class="attr">default-filters:</span></span><br><span class="line">      <span class="attr">routes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">****</span></span><br><span class="line">          <span class="attr">uri:</span> <span class="string">****</span></span><br><span class="line">          <span class="attr">predicates:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">****</span></span><br><span class="line">          <span class="attr">filters:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">****</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">****</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">RequestRateLimiter</span> <span class="string">（请求流量控制）</span></span><br><span class="line">               <span class="attr">args:</span></span><br><span class="line">                 <span class="attr">key-resolver:</span> <span class="string">'#&#123;@remoteAddrKeyResolver&#125;'</span></span><br><span class="line">                 <span class="attr">redis-rate-limiter.replenishRate:</span> <span class="number">3</span> <span class="string">（令牌桶每秒填充平均速率）</span></span><br><span class="line">                 <span class="attr">redis-rate-limiter.burstCapacity:</span> <span class="number">15</span> <span class="string">（令牌桶容量）</span></span><br><span class="line">             <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Hystrix</span> <span class="string">（熔断降级）</span></span><br><span class="line">               <span class="attr">args:</span></span><br><span class="line">                 <span class="attr">name:</span> <span class="string">HystrixCommand</span></span><br><span class="line">                 <span class="attr">fallbackUri:</span> <span class="string">forward:/fallback</span> <span class="string">（降级返回接口路径）</span>    </span><br><span class="line"><span class="attr">hystrix.command.fallbackcmd.execution.isolation.thread.timeoutInMilliseconds:</span> <span class="number">8000</span> <span class="string">（超时时间）</span></span><br></pre></td></tr></table></figure>
+
+<p>6.降级返回/fallback接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FallbackController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(value = <span class="string">"/fallback"</span>)</span><br><span class="line">    <span class="meta">@ResponseStatus</span></span><br><span class="line">    <span class="keyword">public</span> Mono&lt;Map&lt;String, Object&gt;&gt; fallback(ServerWebExchange exchange, Throwable throwable) &#123;</span><br><span class="line">        Map&lt;String, Object&gt; result = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">8</span>);</span><br><span class="line">        ServerHttpRequest request = exchange.getRequest();</span><br><span class="line">        result.put(<span class="string">"path"</span>, request.getPath().pathWithinApplication().value());</span><br><span class="line">        result.put(<span class="string">"method"</span>, request.getMethodValue());</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> != throwable.getCause()) &#123;</span><br><span class="line">            result.put(<span class="string">"message"</span>, throwable.getCause().getMessage());</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            result.put(<span class="string">"message"</span>, throwable.getMessage());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> Mono.just(result);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>7.如果以上配置文件都配置好了，那么恭喜你，可以开始部署了。</p>
+<p>8.服务启动前的准备：redis，rocketmq启动，如果项目使用了nacos，nacos也要先启动。</p>
+<p>9.jar包的部署方式：java -jar ****.jar –spring.config.location=/tiny_gateway/conf/bootstrap.yml（配置文件所在为位置）</p>
+<p>10.Linux的docker的部署方式：docker run -d -p 9400:9400 -e TZ=’Asia/Shanghai’ -v /usr/local/tinyDev:/data –name dev_tiny_gateway java:8u111 java -Xms1024m -Xmx1024m -jar /data/tiny_gateway/lib/tiny-gateway.jar –spring.config.location=file:/data/tiny_gateway/conf/</p>
+<pre><code>- /usr/local/tinyDev：容器需要映射出来的服务器地址
+- dev_tiny_gateway：需要取的名字
+- java:8u111：jdk镜像
+- -Xms1024m -Xmx1024m：堆栈大小
+- /data/tiny_gateway/lib/tiny-gateway.jar：jar包位置
+- file:/data/tiny_gateway/conf/：配置文件所在位置</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/04/26/gateway%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E/" data-id="ck9gh3n660000i0301ozj7lns" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/04/26/gateway%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E/">gateway的配置说明</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 Yang Jian<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
