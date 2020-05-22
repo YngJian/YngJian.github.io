@@ -64,6 +64,97 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-docker日志清理" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/05/21/docker%E6%97%A5%E5%BF%97%E6%B8%85%E7%90%86/" class="article-date">
+  <time datetime="2020-05-21T08:32:25.598Z" itemprop="datePublished">2020-05-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/05/21/docker%E6%97%A5%E5%BF%97%E6%B8%85%E7%90%86/">docker日志清理</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="设置Docker容器日志大小"><a href="#设置Docker容器日志大小" class="headerlink" title="设置Docker容器日志大小"></a>设置Docker容器日志大小</h3><p><strong>设置一个容器服务的日志大小上限</strong></p>
+<p>在启动容器的时候增加一个参数设置该容器的日志大小，及日志驱动</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">--<span class="built_in">log</span>-driver json-file  <span class="comment">#日志驱动</span></span><br><span class="line">--<span class="built_in">log</span>-opt max-size=[0-9+][k|m|g] <span class="comment">#文件的大小</span></span><br><span class="line">--<span class="built_in">log</span>-opt max-file=[0-9+] <span class="comment">#文件数量</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>全局设置</strong></p>
+<p>1.编辑文件<code>/etc/docker/daemon.json</code>, 增加以下日志的配置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"log-driver"</span>:<span class="string">"json-file"</span>,</span><br><span class="line"><span class="string">"log-opts"</span>: &#123;<span class="string">"max-size"</span>:<span class="string">"500m"</span>, <span class="string">"max-file"</span>:<span class="string">"3"</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>max-size=500m，意味着一个容器日志大小上限是500M，<br>max-file=3，意味着一个容器有三个日志，分别是id+.json、id+1.json、id+2.json。</p>
+</blockquote>
+<p>2.然后重启docker守护进程</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 重启docker守护进程</span><br><span class="line"></span><br><span class="line"><span class="comment"># systemctl daemon-reload</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># systemctl restart docker</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：设置的日志大小，只对新建的容器有效。</p>
+</blockquote>
+<h3 id="手动清理docker日志文件"><a href="#手动清理docker日志文件" class="headerlink" title="手动清理docker日志文件"></a>手动清理docker日志文件</h3><p><em>1.查找docker日志文件</em></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find / -<span class="built_in">type</span> f -name <span class="string">"*-json.log"</span></span><br></pre></td></tr></table></figure>
+
+<p><em>2.使用命令查看文件大小</em></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">du -sh *</span><br></pre></td></tr></table></figure>
+
+<p><em>3.清空文件的方式有很多种如下</em></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ : &gt; filename </span><br><span class="line">$ &gt; filename </span><br><span class="line">$ <span class="built_in">echo</span> <span class="string">""</span> &gt; filename </span><br><span class="line">$ <span class="built_in">echo</span> &gt; filename </span><br><span class="line">$ cat /dev/null &gt; filename</span><br></pre></td></tr></table></figure>
+
+<p><em>4.选一种即可</em></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /dev/null &gt;/data2/docker/lib/docker/containers/containerid/containerid-json.log</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>命令可以用于清理磁盘，删除关闭的容器、无用的数据卷和网络，以及dangling镜像(即无tag的镜像):</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker system prune</span><br></pre></td></tr></table></figure>
+
+<p>删除所有悬空镜像，但不会删除未使用镜像：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker rmi $(docker images -f <span class="string">"dangling=true"</span> -q) </span><br></pre></td></tr></table></figure>
+
+<p> 删除所有未使用镜像和悬空镜像:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker rmi $(docker images-q)</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p><em>5.查看docker占用情况</em></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker system df</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>可以查看具体的docker镜像占用情况:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker system df -v</span><br></pre></td></tr></table></figure>
+
+
+</blockquote>
+<h3 id="脚本自动清理Docker容器日志"><a href="#脚本自动清理Docker容器日志" class="headerlink" title="脚本自动清理Docker容器日志"></a>脚本自动清理Docker容器日志</h3><p>如果docker容器正在运行，那么使用rm -rf方式删除日志后，通过df -h会发现磁盘空间并没有释放。rm -rf删除后重启docker再看查看会发现空间已经释放了，也可以把日志清理整理出脚本需要的时候执行一下，docker_log_delete.sh脚本内容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh </span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"======== start clean logs ========"</span>    </span><br><span class="line">logs=$(find /data2/docker/lib/docker/containers/ -name *-json.log)    </span><br><span class="line">    <span class="keyword">for</span> <span class="built_in">log</span> <span class="keyword">in</span> <span class="variable">$logs</span>          </span><br><span class="line">        <span class="keyword">do</span>                  </span><br><span class="line">            <span class="built_in">echo</span> <span class="string">"clean logs : <span class="variable">$log</span>"</span>                  </span><br><span class="line">            cat /dev/null &gt; <span class="variable">$log</span>         </span><br><span class="line">        <span class="keyword">done</span>  </span><br><span class="line"><span class="built_in">echo</span> <span class="string">"======== end clean logs ========"</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># chmod +x docker_log_delete.sh</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ./docker_log_delete.sh</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ sudo crontab -l</span><br><span class="line"><span class="comment"># 每天1点30清理</span></span><br><span class="line">30 1 * * * sh docker_log_delete.sh</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/05/21/docker%E6%97%A5%E5%BF%97%E6%B8%85%E7%90%86/" data-id="ckai5dwtb00007130f5h3hc5a" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-gateway的配置说明" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2020/04/26/gateway%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E/" class="article-date">
@@ -113,7 +204,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/26/gateway%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E/" data-id="ck9gh74jt0000iv30eqaj4wyh" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/04/26/gateway%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E/" data-id="ckai5dwtf00017130gejne9pn" class="article-share-link">Share</a>
       
       
     </footer>
@@ -141,7 +232,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li></ul>
     </div>
   </div>
 
@@ -152,6 +243,10 @@
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2020/05/21/docker%E6%97%A5%E5%BF%97%E6%B8%85%E7%90%86/">docker日志清理</a>
+          </li>
         
           <li>
             <a href="/2020/04/26/gateway%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E/">gateway的配置说明</a>
