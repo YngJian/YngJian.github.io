@@ -64,6 +64,82 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-interview" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/06/24/interview/" class="article-date">
+  <time datetime="2020-06-24T00:34:11.322Z" itemprop="datePublished">2020-06-24</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/24/interview/">interview</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="redis为什么是单线程的，使用时需要注意点什么。"><a href="#redis为什么是单线程的，使用时需要注意点什么。" class="headerlink" title="redis为什么是单线程的，使用时需要注意点什么。"></a>redis为什么是单线程的，使用时需要注意点什么。</h4><ol>
+<li>首先，单线程比较容易实现。其次，redis时基于内存来实现的，cpu不是redis的瓶颈，它的瓶颈时机器的内存或者是网络带宽。</li>
+<li>重要数据的持久化。</li>
+</ol>
+<h4 id="redis为什么会这么快"><a href="#redis为什么会这么快" class="headerlink" title="redis为什么会这么快"></a>redis为什么会这么快</h4><ol>
+<li>单线程模式</li>
+<li>存储结构简单，对数据操作也简单</li>
+<li>完全是基于内存的</li>
+<li>使用的是I/O复用模型，非阻塞IO</li>
+</ol>
+<h4 id="什么是I-O复用模型，非阻塞IO"><a href="#什么是I-O复用模型，非阻塞IO" class="headerlink" title="什么是I/O复用模型，非阻塞IO"></a>什么是I/O复用模型，非阻塞IO</h4><p>下面举个例子，模拟一个tcp服务器处理30个客户socket。假设你是一个监考老师，让30个学生解答一道竞赛考题，然后负责验收学生答卷，你有下面几个选择：</p>
+<ol>
+<li>第一种选择，按顺序逐个验收。其中，如果有一个出现问题，全班都会被耽误。这就好比你开循环去挨个处理socket，根本不具有并发能力。</li>
+<li>第二种选择，你创建30个分身，每个分身都去检查学生的准确性，就好比为每个用户创建一个进程或线程去处理请求。</li>
+<li>第三种选择，你站在讲台等，谁解答玩谁举手，你去检查谁。这种就是IO的复用模型，Linux下的select、poll和epoll就是干这个的，将用户的socket对应的fd注册进epoll，然后epoll帮你监听哪些socket上有消息到达，这样就避免了大量的无用操作，此时的socket应该采用非阻塞模式。这样，整个过程只在调用select、poll、epoll这些调用的时候才会阻塞，收发客户信息是不会阻塞的，整个进程或者线程就被充分利用起来，这就是事件驱动，所谓的reactor模式。</li>
+</ol>
+<p>针对上面的举例在redis中的表现为：有30个redis的客户端与redis服务器的网络连接模块保持TCP的连接，客户端会不定时的发送请求给服务器，当有一个redis客户端发起请求，会触发Linux系统像epoll这样的系统调用，redis的I/O多路复用模块封装了底层的epoll这样的I/O多路复用函数，然后转发到相应事件的处理器。</p>
+<p>文件事件处理器使用I/O多路复用模块同时监听多个FD（文件描述符），当accept、read、write和close事件发生时，文件事件处理器就会回调FD绑定的事件处理器。</p>
+<p>虽然整个文件事件处理器是在单线程上运行的，但是通过I/O多路复用模块的引入，实现了同时对多个FD读写的监控，提高了网络通信模型的性能，同时也可以保证整个redis服务实现的简单。</p>
+<h4 id="Synchronize-和-Rock-的区别"><a href="#Synchronize-和-Rock-的区别" class="headerlink" title="Synchronize 和 Rock 的区别"></a>Synchronize 和 Rock 的区别</h4><ol>
+<li>Lock是一个接口，而synchronized是Java中的关键字，synchronized是内置的语言实现；</li>
+<li>synchronized在发生异常时，会自动释放线程占有的锁，因此不会导致死锁现象发生；而Lock在发生异常时，如果没有主动通过unLock()去释放锁，则很可能造成死锁现象，因此使用Lock时需要在finally块中释放锁；</li>
+<li>Lock可以让等待锁的线程响应中断，而synchronized却不行，使用synchronized时，等待的线程会一直等待下去，不能够响应中断；</li>
+<li>通过Lock可以知道有没有成功获取锁，而synchronized却无法办到。</li>
+<li>Lock可以提高多个线程进行读操作的效率。（可以通过readwritelock实现读写分离）</li>
+<li>性能上来说，在资源竞争不激烈的情形下，Lock性能稍微比synchronized差点（编译程序通常会尽可能的进行优化synchronized）。但是当同步非常激烈的时候，synchronized的性能一下子能下降好几十倍。而ReentrantLock确还能维持常态。</li>
+</ol>
+<p>[]: <a href="https://juejin.im/post/5a43ad786fb9a0450909cb5f" target="_blank" rel="noopener">https://juejin.im/post/5a43ad786fb9a0450909cb5f</a>    “区别”</p>
+<h4 id="乐观锁和悲观锁"><a href="#乐观锁和悲观锁" class="headerlink" title="乐观锁和悲观锁"></a>乐观锁和悲观锁</h4><ol>
+<li>总是假设最坏的情况，每次去拿数据的时候都认为别人会修改，所以每次在拿数据的时候都会上锁，这样别人想拿这个数据就会阻塞直到它拿到锁（<strong>共享资源每次只给一个线程使用，其它线程阻塞，用完后再把资源转让给其它线程</strong>）。传统的关系型数据库里边就用到了很多这种锁机制，比如行锁，表锁等，读锁，写锁等，都是在做操作之前先上锁。Java中<code>synchronized</code>和<code>ReentrantLock</code>等独占锁就是悲观锁思想的实现。</li>
+<li>总是假设最好的情况，每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据，可以使用版本号机制和CAS算法实现。<strong>乐观锁适用于多读的应用类型，这样可以提高吞吐量</strong>，像数据库提供的类似于<strong>write_condition机制</strong>，其实都是提供的乐观锁。在Java中<code>java.util.concurrent.atomic</code>包下面的原子变量类就是使用了乐观锁的一种实现方式<strong>CAS</strong>实现的。</li>
+<li>从上面对两种锁的介绍，我们知道两种锁各有优缺点，不可认为一种好于另一种，像<strong>乐观锁适用于写比较少的情况下（多读场景）</strong>，即冲突真的很少发生的时候，这样可以省去了锁的开销，加大了系统的整个吞吐量。但如果是多写的情况，一般会经常产生冲突，这就会导致上层应用会不断的进行retry，这样反倒是降低了性能，所以<strong>一般多写的场景下用悲观锁就比较合适。</strong></li>
+</ol>
+<p>[]: <a href="https://juejin.im/post/5b4977ae5188251b146b2fc8" target="_blank" rel="noopener">https://juejin.im/post/5b4977ae5188251b146b2fc8</a>    “锁的说明”</p>
+<h4 id="主键索引和普通索引的区别"><a href="#主键索引和普通索引的区别" class="headerlink" title="主键索引和普通索引的区别"></a>主键索引和普通索引的区别</h4><ol>
+<li><strong>主键索引</strong>：它是一种特殊的唯一索引，不允许有空值。一般是在建表的时候指定了主键，就会创建主键索引， CREATE INDEX不能用来创建主键索引，使用 ALTER TABLE来代替。</li>
+<li><strong>唯一索引</strong>：与普通索引类似，不同的就是：索引列的值必须唯一，但允许有空值。如果是组合索引，则列值的组合必须一。</li>
+<li><strong>普通索引</strong>：这是最基本的索引，它没有任何限制。</li>
+<li><strong>全文索引</strong>：FULLTEXT索引用于全文搜索。只有InnoDB和 MyISAM存储引擎支持 FULLTEXT索引和仅适用于 CHAR， VARCHAR和 TEXT列。</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/06/24/interview/" data-id="ckd6ytklm0002l730c6nu5fxe" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-mac可视化k8s搭建" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2020/06/09/mac%E5%8F%AF%E8%A7%86%E5%8C%96k8s%E6%90%AD%E5%BB%BA/" class="article-date">
@@ -151,7 +227,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/06/09/mac%E5%8F%AF%E8%A7%86%E5%8C%96k8s%E6%90%AD%E5%BB%BA/" data-id="ckcvqrnwz00031l305hen6gof" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/06/09/mac%E5%8F%AF%E8%A7%86%E5%8C%96k8s%E6%90%AD%E5%BB%BA/" data-id="ckd6ytklo0004l7301rtl3suw" class="article-share-link">Share</a>
       
       
     </footer>
@@ -232,7 +308,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/05/27/logback%E4%BD%BF%E7%94%A8%E8%A7%84%E8%8C%83%E6%96%87%E6%A1%A3/" data-id="ckcvqrnwy00021l304jdn35bk" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/05/27/logback%E4%BD%BF%E7%94%A8%E8%A7%84%E8%8C%83%E6%96%87%E6%A1%A3/" data-id="ckd6ytkln0003l730289j0a88" class="article-share-link">Share</a>
       
       
     </footer>
@@ -323,7 +399,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/05/21/docker%E6%97%A5%E5%BF%97%E6%B8%85%E7%90%86/" data-id="ckcvqrnws00001l30fq9h3ceg" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/05/21/docker%E6%97%A5%E5%BF%97%E6%B8%85%E7%90%86/" data-id="ckd6ytkll0001l7303d3afskp" class="article-share-link">Share</a>
       
       
     </footer>
@@ -382,7 +458,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/26/gateway%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E/" data-id="ckcvqrnwx00011l30bbui9iyp" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2020/04/26/gateway%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E/" data-id="ckd6ytklf0000l730fffx8l5h" class="article-share-link">Share</a>
       
       
     </footer>
@@ -421,6 +497,10 @@
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2020/06/24/interview/">interview</a>
+          </li>
         
           <li>
             <a href="/2020/06/09/mac%E5%8F%AF%E8%A7%86%E5%8C%96k8s%E6%90%AD%E5%BB%BA/">mac可视化k8s搭建</a>
